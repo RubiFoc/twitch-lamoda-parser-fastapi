@@ -1,13 +1,14 @@
-import os
 import asyncio
 import httpx
+
 from app.config.twich_settings import twitch_settings
+from app.core.mongo import MongoService
 
 
 async def get_top_streams_by_query(filter_type_and_query, limit=100):
     filter_type, query = filter_type_and_query.split('&')
     query = query.replace('_', ' ')
-    # Получение токена доступа
+
     token_url = "https://id.twitch.tv/oauth2/token"
     token_params = {
         "client_id": twitch_settings.client_id,
@@ -25,8 +26,8 @@ async def get_top_streams_by_query(filter_type_and_query, limit=100):
             'Client-Id': twitch_settings.client_id
         }
 
+        streams_url = 'https://api.twitch.tv/helix/streams'
         if filter_type == 'category':
-            # Получение ID категории
             category_url = 'https://api.twitch.tv/helix/games'
             category_params = {'name': query}
             category_response = await client.get(category_url, headers=headers, params=category_params)
@@ -41,19 +42,14 @@ async def get_top_streams_by_query(filter_type_and_query, limit=100):
                 return []
 
             category_id = category_data['data'][0]['id']
-
-            # Получение стримов по категории
-            streams_url = 'https://api.twitch.tv/helix/streams'
             streams_params = {
                 'game_id': category_id,
-                'first': limit  # Получение топовых `limit` стримов
+                'first': limit
             }
         elif filter_type == 'channel':
-            # Получение стримов по каналу
-            streams_url = 'https://api.twitch.tv/helix/streams'
             streams_params = {
                 'user_login': query,
-                'first': limit  # Получение топовых `limit` стримов
+                'first': limit
             }
         else:
             print(f"Unknown filter type: {filter_type}")
@@ -65,17 +61,22 @@ async def get_top_streams_by_query(filter_type_and_query, limit=100):
             print(f"Error getting streams: {streams_response.status_code}")
             return []
 
-        return streams_response.json()['data']
+        streams_data = streams_response.json()['data']
+
+        mongo_service = MongoService()
+        for stream in streams_data:
+            mongo_service.insert_document('streams', stream)
+
+        return streams_data
 
 
-async def main():
-    # Пример использования
-    filter_type_and_query = 'category&Just_Chatting'  # или 'channel&example_channel'
-    streams = await get_top_streams_by_query(filter_type_and_query, limit=10)
-
-    for stream in streams:
-        print(f"Streamer: {stream['user_name']}, Title: {stream['title']}, Viewers: {stream['viewer_count']}")
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+# async def main():
+#     filter_type_and_query = 'category&Just_Chatting'
+#     streams = await get_top_streams_by_query(filter_type_and_query, limit=10)
+#
+#     for stream in streams:
+#         print(f"Streamer: {stream['user_name']}, Title: {stream['title']}, Viewers: {stream['viewer_count']}")
+#
+#
+# if __name__ == "__main__":
+#     asyncio.run(main())

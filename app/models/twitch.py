@@ -10,3 +10,6 @@ class Channel(BaseModel):
     channel_name: str
     game_name: str
 
+
+class Filter(BaseModel):
+    query: str

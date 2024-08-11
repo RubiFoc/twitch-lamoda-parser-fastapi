@@ -7,7 +7,7 @@ class TwitchSettings(BaseSettings):
 
     class Config:
         env_prefix = "TWITCH_"
-        env_file = "../../.env"
+        env_file = "../.env"
 
 
 twitch_settings = TwitchSettings()
