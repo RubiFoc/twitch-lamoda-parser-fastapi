@@ -8,7 +8,7 @@ class MongoSettings(BaseSettings):
 
     class Config:
         env_prefix = 'MONGO_'
-        env_file = ".env"
+        env_file = "../.env"
 
 
 mongo_settings = MongoSettings()

@@ -9,6 +9,7 @@ class Category(BaseModel):
 class Channel(BaseModel):
     channel_name: str
     game_name: str
+    viewers_count: int
 
 
 class Filter(BaseModel):

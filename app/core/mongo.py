@@ -1,16 +1,15 @@
-from bson import ObjectId
 from pymongo import MongoClient
 
-from app.config.mongo_settings import MongoSettings
+from app.config.mongo_settings import mongo_settings
 
 
 class MongoService:
     def __init__(self):
         self.client = MongoClient(
-            host=MongoSettings.host,
-            port=MongoSettings.port,
+            host=mongo_settings.host,
+            port=mongo_settings.port,
         )
-        self.db = self.client[MongoSettings.database]
+        self.db = self.client[mongo_settings.database]
 
     def insert_document(self, collection_name, document):
         collection = self.db[collection_name]

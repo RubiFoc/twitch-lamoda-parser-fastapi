@@ -7,7 +7,7 @@ class KafkaSettings(BaseSettings):
 
     class Config:
         env_prefix = "KAFKA_"
-        env_file = ".env"
+        env_file = "../.env"
 
 
 kafka_settings = KafkaSettings()

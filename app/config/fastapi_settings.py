@@ -7,8 +7,8 @@ class FastAPISettings(BaseSettings):
     debug: bool
 
     class Config:
-        env_prefix = "FASTAPI_"
-        env_file = ".env"
+        env_prefix = "API_"
+        env_file = "../.env"
 
 
 fastapi_settings = FastAPISettings()

@@ -1,15 +1,17 @@
 from fastapi import FastAPI
 
+from app.config.fastapi_settings import fastapi_settings
+from app.utils.exception_handler import exception_handler
+from app.routers import twitch
+
 app = FastAPI()
 
-
-@app.get("/", tags=["Root"])
-async def read_root():
-    return {"message": "Welcome to this fantastic app!"}
+app.add_exception_handler(Exception, exception_handler)
+# app.include_router(lamoda.router)
+app.include_router(twitch.router)
 
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-    uvicorn.run("server.app:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(app, host=fastapi_settings.host, port=fastapi_settings.port)

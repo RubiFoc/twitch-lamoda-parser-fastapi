@@ -9,7 +9,7 @@ class RedisSettings(BaseSettings):
 
     class Config:
         env_prefix = 'REDIS_'
-        env_file = '.env'
+        env_file = "../.env"
 
 
 redis_settings = RedisSettings()
