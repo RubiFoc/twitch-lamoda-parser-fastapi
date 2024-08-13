@@ -26,3 +26,4 @@ class MongoService:
     def get_documents(self, collection_name, objects_query):
         collection = self.db[collection_name]
         return collection.find(objects_query)
+

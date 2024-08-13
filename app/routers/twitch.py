@@ -1,10 +1,12 @@
+from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 from fastapi.encoders import jsonable_encoder
 
 from app.core.mongo import MongoService
 from app.core.twitch_parser import get_top_streams_by_query
-from app.models.twitch import Filter, Category
+from app.models.twitch import Filter, Category, Channel
 from app.services.kafka import KafkaService
+from app.utils.streamers_getter import get_streamers
 
 router = APIRouter(prefix="/twitch")
 mongo_service = MongoService()
@@ -18,21 +20,43 @@ async def start_parsing(filter: Filter):
     return {"message": "Parsed successfully!"}
 
 
-@router.post("/get_streamers_by_category")
+@router.get("/streamers/{category}")
 async def get_top_category_streamers(category: str):
     query = {"game_name": category}
-    streamers = mongo_service.get_documents('twitch_channels', query)
-    streamers_list = []
-    for streamer in streamers:
-        streamer['_id'] = str(streamer['_id'])
-        streamers_list.append(streamer)
-
-    streamers_list.sort(key=lambda x: x['viewers_count'], reverse=True)
-    response = [{**streamer} for streamer in streamers_list]
+    response = get_streamers(query)
     return jsonable_encoder({category: response})
 
 
-@router.post("/add_category")
+@router.get("/streamers_by_nick/{nick}")
+async def get_streamer_by_nick(nick: str):
+    query = {"channel_name": nick}
+    response = get_streamers(query)
+    return response
+
+
+@router.get("/streamers")
+async def get_all_parsed_streamers():
+    query = {}
+    response = get_streamers(query)
+    return response
+
+
+@router.delete("/streamers/{id}")
+async def delete_streamer_by_id(id: str):
+    query = {"_id": ObjectId(id)}
+    mongo_service.delete_document('twitch_streamers', query)
+    return {"message": "Deleted successfully!"}
+
+
+@router.put("/streamers/{id}")
+async def update_streamer_by_id(id: str, channel: Channel):
+    query = {"_id": id}
+    update = {"$set": channel.dict()}
+    mongo_service.update_document("twitch_channels", query, update)
+    return {"message": "Channel updated successfully"}
+
+
+@router.post("/categories")
 async def add_category(category: Category):
     query = category.dict()
     category_query = {"name": query["name"]}
@@ -45,13 +69,16 @@ async def add_category(category: Category):
     return {"message": "Added successfully!"}
 
 
-@router.post("/delete_category")
-async def delete_category(category: Category):
-    query = category.dict()
+@router.delete("/categories/{category_id}")
+async def delete_category(category_id):
+    query = {"_id": category_id}
     mongo_service.delete_document('twitch_categories', query)
     return {"message": "Deleted successfully!"}
 
 
-@router.post("/update_category")
-async def update_category(category_to_update: Category, new_values: Category):
-    mongo_service.update_document('twitch_categories', category_to_update.dict(), new_values.dict())
+@router.put("/categories/{id}")
+async def update_category(category_id: str, category: Category):
+    query = {"_id": category_id}
+    update = {"$set": category.dict()}
+    mongo_service.update_document("twitch_categories", query, update)
+    return {"message": "Category updated successfully"}
