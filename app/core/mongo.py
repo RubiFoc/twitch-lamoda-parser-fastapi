@@ -23,7 +23,18 @@ class MongoService:
         collection = self.db[collection_name]
         collection.update_one(object_query, update_query)
 
-    def get_documents(self, collection_name, objects_query):
+    def get_documents(self, collection_name, objects_query, skip=0, limit=60):
         collection = self.db[collection_name]
-        return collection.find(objects_query)
+        return collection.find(objects_query).skip(skip).limit(limit)
 
+    def get_collections(self):
+        collections = self.db.list_collection_names()
+        return collections
+
+    def count_documents(self, collection_name, objects_query):
+        collection = self.db[collection_name]
+        return collection.count_documents(objects_query)
+
+    def drop_collection(self, collection_name):
+        collection = self.db[collection_name]
+        collection.drop()
