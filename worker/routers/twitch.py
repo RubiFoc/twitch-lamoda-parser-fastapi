@@ -5,11 +5,10 @@ from fastapi.encoders import jsonable_encoder
 from core.mongo import MongoService
 from models.twitch import Filter, Category, Channel
 from services.kafka import KafkaService
-from services.twich_services import TwichService
+from utils.streamers_getter import get_streamers
 
 router = APIRouter(prefix="/twitch")
 mongo_service = MongoService()
-twitch_service = TwichService()
 
 
 @router.post("/parse")
@@ -22,21 +21,21 @@ async def start_parsing(filter: Filter):
 @router.get("/streamers/{category}")
 async def get_top_category_streamers(category: str):
     query = {"game_name": category}
-    response = twitch_service.get_streamers(query)
+    response = get_streamers(query)
     return jsonable_encoder({category: response})
 
 
 @router.get("/streamers_by_nick/{nick}")
 async def get_streamer_by_nick(nick: str):
     query = {"channel_name": nick}
-    response = twitch_service.get_streamers(query)
+    response = get_streamers(query)
     return response
 
 
 @router.get("/streamers")
 async def get_all_parsed_streamers():
     query = {}
-    response = twitch_service.get_streamers(query)
+    response = get_streamers(query)
     return response
 
 
@@ -57,7 +56,14 @@ async def update_streamer_by_id(id: str, channel: Channel):
 
 @router.post("/categories")
 async def add_category(category: Category):
-    twitch_service.add_category(category)
+    query = category.dict()
+    category_query = {"name": query["name"]}
+    id_query = {"id": category.id}
+    if mongo_service.db['twitch_categories'].count_documents(category_query) > 0:
+        return {"message": "The category already exists!"}
+    if mongo_service.db['twitch_categories'].count_documents(id_query) > 0:
+        return {"message": "The category with this id already exists!"}
+    mongo_service.insert_document('twitch_categories', query)
     return {"message": "Added successfully!"}
 
 

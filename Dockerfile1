@@ -12,8 +12,13 @@ RUN pip install poetry \
     && poetry config virtualenvs.create false \
     && poetry install --no-dev
 
-COPY app /parser/
+COPY worker /parser/
 
-FROM base as fastapi
+FROM base as consumer
 RUN chmod +x entrypoints/entrypoint_fastapi.sh
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "main.py"]
+
+FROM base as consumer
+RUN chmod +x entrypoints/entrypoint_consumer.sh
+CMD ["python", "start_consumer.py"]
+

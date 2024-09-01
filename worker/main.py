@@ -14,4 +14,5 @@ app.include_router(twitch.router)
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host=fastapi_settings.host, port=fastapi_settings.port)

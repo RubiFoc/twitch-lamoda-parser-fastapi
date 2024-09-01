@@ -9,7 +9,6 @@ from config.kafka_settings import kafka_settings
 class KafkaService:
     def __init__(self):
         self.bootstrap_servers = kafka_settings.bootstrap_servers
-        # self.topic = kafka_settings.topic
         self.logger = logging.getLogger("KafkaService")  # Create a logger instance
 
     async def send_message(self, topic, message: str):
