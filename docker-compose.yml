@@ -11,6 +11,7 @@ services:
     depends_on:
       - mongo
       - kafka
+      - redis
 
   worker1:
     container_name: worker1
@@ -23,6 +24,7 @@ services:
       - mongo
       - kafka
       - fastapi
+      - redis
 
   mongo:
     container_name: mongo
@@ -61,5 +63,14 @@ services:
       KAFKA_CLUSTERS_0_TYPE: simple
       KAFKA_CLUSTERS_0_MODE: single
 
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+
 volumes:
   mongo-data:
+  redis-data:
