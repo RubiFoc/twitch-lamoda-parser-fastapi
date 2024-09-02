@@ -18,7 +18,9 @@ httpx: Async HTTP client
 aioredis: Async Redis client
 aiokafka: Async Kafka client
 pymongo: MongoDB driver
+
 Features
+
 1. Lamoda Parsing:
 Utilizes BeautifulSoup to scrape product information from Lamoda website
 Handles various product pages and categories
