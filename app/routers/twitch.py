@@ -21,22 +21,24 @@ async def start_parsing(filter: Filter):
 
 @router.get("/streamers/{category}")
 async def get_top_category_streamers(category: str):
+    cache_key = f"category_{category}"
     query = {"game_name": category}
-    response = twitch_service.get_streamers(query)
+    response = twitch_service.get_streamers(query, cache_key)
     return jsonable_encoder({category: response})
 
 
 @router.get("/streamers_by_nick/{nick}")
 async def get_streamer_by_nick(nick: str):
     query = {"channel_name": nick}
-    response = twitch_service.get_streamers(query)
+    response = twitch_service.get_streamers(query, None)
     return response
 
 
 @router.get("/streamers")
 async def get_all_parsed_streamers():
+    cache_key = "all_parsed_streamers"
     query = {}
-    response = twitch_service.get_streamers(query)
+    response = twitch_service.get_streamers(query, cache_key)
     return response
 
 

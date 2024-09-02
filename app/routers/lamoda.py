@@ -24,7 +24,6 @@ async def start_parsing(task: Task):
 async def get_all_categories():
     cache_key = "categories"
     categories = lamoda_service.get_all_categories(cache_key)
-    await redis_service.set_with_ttl(cache_key, json.dumps(categories), 3600)  # 1 час
     return {"Categories": categories}
 
 
@@ -32,7 +31,6 @@ async def get_all_categories():
 async def get_category(category: str, skip: int = 0, limit: int = 60):
     cache_key = f"category_{category}_{skip}_{limit}"
     response = lamoda_service.get_category(category, skip, limit, cache_key)
-    await redis_service.set_with_ttl(cache_key, json.dumps(response), 300)  # 5 минут
     return response
 
 
@@ -56,11 +54,9 @@ async def create_category(category: str):
 
 @router.put("/products")
 async def update_product(id: str, category: str, query_to_update: Product):
-    cache_key = f"product_{category}_{id}"
     query = {"_id": id}
     update = {"$set": query_to_update.dict()}
     mongo_service.update_document("lamoda_" + category, query, update)
-    await redis_service.set_with_ttl(cache_key, json.dumps(cache_key), 3600)
     return {"message": "Product updated successfully"}
 
 
@@ -74,5 +70,4 @@ async def get_product(category: str, id: str):
 @router.post("/products/{category}")
 async def create_product(category: str, name: str, price: float, brand: str, link: str):
     await lamoda_service.create_product(category, name, price, brand, link)
-
     return {"message": "Product created successfully!"}

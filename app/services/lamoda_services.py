@@ -22,6 +22,7 @@ class LamodaService:
         for collection in collections:
             if 'lamoda' in collection:
                 categories.append(collection.split('_')[1])
+        await redis_service.set_with_ttl(cache_key, json.dumps(categories), 3600)  # 1 час
         return categories
 
 
@@ -55,6 +56,7 @@ class LamodaService:
             "next_page": f"/categories/{category}?skip={next_skip}&limit={limit}" if next_skip is not None else None,
             "prev_page": f"/categories/{category}?skip={prev_skip}&limit={limit}" if prev_skip is not None else None
         }
+        await redis_service.set_with_ttl(cache_key, json.dumps(response), 300)  # 5 минут
         return response
 
     async def get_product(self, category: str, id, cache_key=None):
