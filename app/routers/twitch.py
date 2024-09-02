@@ -23,14 +23,14 @@ async def start_parsing(filter: Filter):
 async def get_top_category_streamers(category: str):
     cache_key = f"category_{category}"
     query = {"game_name": category}
-    response = twitch_service.get_streamers(query, cache_key)
+    response = await twitch_service.get_streamers(query, cache_key)
     return jsonable_encoder({category: response})
 
 
 @router.get("/streamers_by_nick/{nick}")
 async def get_streamer_by_nick(nick: str):
     query = {"channel_name": nick}
-    response = twitch_service.get_streamers(query, None)
+    response = await twitch_service.get_streamers(query, None)
     return response
 
 
@@ -38,7 +38,7 @@ async def get_streamer_by_nick(nick: str):
 async def get_all_parsed_streamers():
     cache_key = "all_parsed_streamers"
     query = {}
-    response = twitch_service.get_streamers(query, cache_key)
+    response = await twitch_service.get_streamers(query, cache_key)
     return response
 
 
@@ -59,7 +59,7 @@ async def update_streamer_by_id(id: str, channel: Channel):
 
 @router.post("/categories")
 async def add_category(category: Category):
-    twitch_service.add_category(category)
+    await twitch_service.add_category(category)
     return {"message": "Added successfully!"}
 
 

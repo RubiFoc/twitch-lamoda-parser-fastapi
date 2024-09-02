@@ -23,14 +23,14 @@ async def start_parsing(task: Task):
 @router.get("/categories")
 async def get_all_categories():
     cache_key = "categories"
-    categories = lamoda_service.get_all_categories(cache_key)
+    categories = await lamoda_service.get_all_categories(cache_key)
     return {"Categories": categories}
 
 
 @router.get("/categories/{category}")
 async def get_category(category: str, skip: int = 0, limit: int = 60):
     cache_key = f"category_{category}_{skip}_{limit}"
-    response = lamoda_service.get_category(category, skip, limit, cache_key)
+    response = await lamoda_service.get_category(category, skip, limit, cache_key)
     return response
 
 
@@ -63,7 +63,7 @@ async def update_product(id: str, category: str, query_to_update: Product):
 @router.get("/products/{category}/{id}")
 async def get_product(category: str, id: str):
     cache_key = f"product_{category}_{id}"
-    product = lamoda_service.get_product(category, id, cache_key)
+    product = await lamoda_service.get_product(category, id, cache_key)
     return product.dict()
 
 
