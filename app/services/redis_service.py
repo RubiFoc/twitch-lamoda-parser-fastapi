@@ -1,4 +1,3 @@
-import asyncio
 import redis.asyncio as redis
 from typing import Optional
 
