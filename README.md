@@ -1,11 +1,15 @@
 Twitch-Lamoda Parser FastAPI Backend
+
 Overview
+
 This project implements a FastAPI backend for parsing Lamoda website data using BeautifulSoup (bs4) and Twitch API data using requests. The backend utilizes various modern Python technologies and frameworks to create a robust and efficient parsing solution.
 
 Project Structure
+
 The project uses Poetry for dependency management and follows standard Python package structure conventions.
 
 Dependencies
+
 FastAPI: Web framework for building APIs
 BeautifulSoup (bs4): HTML parsing library
 Requests: HTTP library for API calls
